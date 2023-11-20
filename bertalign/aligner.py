@@ -118,6 +118,16 @@ class Bertalign:
             tgt_line = self._get_line(bead[1], self.tgt_sents)
             print(src_line + "\n" + tgt_line + "\n")
 
+    def aligned_sentences(self):
+        for src, tgt in self.result:
+            yield [self.src_sents[i] for i in src], [self.tgt_sents[i] for i in tgt]
+
+    def aligned_sentences_joined(self, sep=" "):
+        return map(
+            lambda elem: (sep.join(elem[0]), sep.join(elem[1])),
+            self.aligned_sentences(),
+        )
+
     @staticmethod
     def _get_line(bead, lines):
         line = ""
