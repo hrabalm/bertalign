@@ -1,3 +1,4 @@
+import logging
 import sys
 
 import numpy as np
@@ -5,6 +6,8 @@ import numpy as np
 from bertalign import model
 from bertalign.corelib import *
 from bertalign.utils import *
+
+logger = logging.getLogger(__name__)
 
 
 class Bertalign:
@@ -45,18 +48,15 @@ class Bertalign:
         src_lang = LANG.ISO[src_lang]
         tgt_lang = LANG.ISO[tgt_lang]
 
-        print(
+        logger.info(
             "Source language: {}, Number of sentences: {}".format(src_lang, src_num),
-            file=sys.stderr,
         )
-        print(
+        logger.info(
             "Target language: {}, Number of sentences: {}".format(tgt_lang, tgt_num),
-            file=sys.stderr,
         )
 
-        print(
+        logger.info(
             "Embedding source and target text using {} ...".format(model.model_name),
-            file=sys.stderr,
         )
         src_vecs, src_lens = model.transform(src_sents, max_align - 1)
         tgt_vecs, tgt_lens = model.transform(tgt_sents, max_align - 1)
@@ -76,7 +76,7 @@ class Bertalign:
         self.tgt_vecs = tgt_vecs
 
     def align_sents(self):
-        print("Performing first-step alignment ...", file=sys.stderr)
+        logger.info("Performing first-step alignment ...")
         D, I = find_top_k_sents(self.src_vecs[0, :], self.tgt_vecs[0, :], k=self.top_k)
         first_alignment_types = get_alignment_types(2)  # 0-1, 1-0, 1-1
         first_w, first_path = find_first_search_path(self.src_num, self.tgt_num)
@@ -91,7 +91,7 @@ class Bertalign:
             first_alignment_types,
         )
 
-        print("Performing second-step alignment ...", file=sys.stderr)
+        logger.info("Performing second-step alignment ...")
         second_alignment_types = get_alignment_types(self.max_align)
         second_w, second_path = find_second_search_path(
             first_alignment, self.win, self.src_num, self.tgt_num
@@ -117,10 +117,9 @@ class Bertalign:
             second_alignment_types,
         )
 
-        print(
+        logger.info(
             "Finished! Successfully aligning {} {} sentences to {} {} sentences\n"
             .format(self.src_num, self.src_lang, self.tgt_num, self.tgt_lang),
-            file=sys.stderr,
         )
         self.result = second_alignment
 
