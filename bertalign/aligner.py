@@ -120,7 +120,10 @@ class Bertalign:
 
     def aligned_sentences(self):
         for src, tgt in self.result:
-            yield [self.src_sents[i] for i in src], [self.tgt_sents[i] for i in tgt]
+            src_sents = [self.src_sents[i] for i in src]
+            tgt_sents = [self.tgt_sents[i] for i in tgt]
+            if len(src_sents) > 0 and len(tgt_sents):
+                yield src_sents, tgt_sents
 
     def aligned_sentences_joined(self, sep=" "):
         return map(
